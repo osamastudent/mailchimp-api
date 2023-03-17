@@ -1,0 +1,73 @@
+composer.json k andr :
+"files": ["app/Providers/myservices/newsletterclass.php"]
+---->line no:30 ,31 k (,) k baad
+or phir cmd pr ---> composer  dump-autoload
+******************************************************
+
+**************tinker check**************************
+config('services.mailchimp')
+= [
+    "key" => "72ac7f8bdde81c5db64c818efecd0533-us18",
+  ]
+
+> config('services.mailchimp.key')
+= "72ac7f8bdde81c5db64c818efecd0533-us18"
+
+
+**************marketin api url --->sercj it --->marketing quick start/deveeloper**************************
+url------->
+https://mailchimp.com/developer/marketing/guides/quick-start/
+
+
+
+
+********method do like this*********
+.env k sb say end may------> 
+MAILCHIMP_KEY=72ac7f8bdde81c5db64c818efecd0533-us18
+MAILCHIMP_LIST_SUBSCRIBERS=162738f2fb
+
+
+
+
+config  k andr services k andr:
+
+'mailchimp'=>[
+    'key'=>env('MAILCHIMP_KEY'),
+    'lists'=>[
+        'subscribers'=>env('MAILCHIMP_LIST_SUBSCRIBERS')
+    ]
+]
+];
+
+
+
+controller k indr:
+function mailchimp(){
+    request()->validate(['email'=>'required | email']);
+    $mailchimp = new \MailchimpMarketing\ApiClient();
+
+    $mailchimp->setConfig([
+        'apiKey' => config('services.mailchimp.key'),
+        'server' => 'us18'
+    ]);
+    try{
+        
+       $response = $mailchimp->lists->addListMember(config('services.mailchimp.lists.subscribers'), [
+        "email_address" => request('email'),
+        "status" => "subscribed",
+    ]);
+    }
+catch(\Exception $e){
+throw \Illuminate\Validation\ValidationException::withMessages([
+    'email'=>'this is email cound not be added  to our newsletter'
+]);
+}
+    return redirect('/dashboard')->with('success','you are now singed for  our newsletter.');
+
+    /* $response = $mailchimp->lists->addListMember("162738f2fb", [
+    "email_address" => "Lindsey.White93@hotmail.com",
+    "status" => "subscribed",
+]);
+    ddd($response);  
+ */
+}
